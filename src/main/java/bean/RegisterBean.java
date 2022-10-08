@@ -1,13 +1,15 @@
 package bean;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class RegisterBean implements Serializable {
 	private String date;
 	private float height;
 	private float weight;
 	private float temperature;
-	
+	private ArrayList<String> errorList;
+
 	public RegisterBean() {
 	}
 
@@ -42,6 +44,17 @@ public class RegisterBean implements Serializable {
 	public void setTemperature(float temperature) {
 		this.temperature = temperature;
 	}
-	
-	
+
+	public void setErrorList(ArrayList<String> errorList) {
+		this.errorList = errorList;
+	}
+
+	public String getErrorList() {
+		String eList = "";
+		
+		for (String str : errorList) {
+			eList = eList + str + "<br/>";
+		}
+		return eList;
+	}
 }
