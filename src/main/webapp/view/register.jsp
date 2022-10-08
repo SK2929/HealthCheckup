@@ -3,7 +3,7 @@
 <!-- <!DOCTYPE html> -->
 <html>
 <head>
-	<title>確認画面</title>
+<title>確認画面</title>
 </head>
 <body>
 	<h2>入力情報を確認してください</h2>
