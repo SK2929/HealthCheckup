@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import bean.RegisterBean;
+import db.DbConnection;
 
 /**
  * Servlet implementation class RegisterServlet
@@ -20,7 +21,9 @@ public class RegisterServlet extends HttpServlet {
 	
 	// エラー格納用
 	ArrayList<String> errorList;
-
+	// 条件分岐用
+	int insertResultnum;
+	
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
@@ -80,10 +83,19 @@ public class RegisterServlet extends HttpServlet {
 			// Beanをリクエストに格納
 			request.setAttribute("rb", rb);
 			
-			// register.jspへフォワード // URLでjspのファイルパスを指定
-			RequestDispatcher rd = request.getRequestDispatcher("./register.jsp");
-			rd.forward(request, response);
-		} else {
+			// DBデータ登録処理
+			insertResultnum = DbConnection.register(date, fheight, fweight, ftemperature);
+			
+			if (insertResultnum == 1) {
+				// register.jspへフォワード // URLでjspのファイルパスを指定
+				RequestDispatcher rd = request.getRequestDispatcher("./register.jsp");
+				rd.forward(request, response);
+			} else {
+				errorList.add("データ登録に失敗しました");
+			}
+		}
+		
+		if (errorList.size() != 0) {
 			// Beanに格納
 			rb.setErrorList(errorList);
 			
@@ -94,9 +106,9 @@ public class RegisterServlet extends HttpServlet {
 			RequestDispatcher rd = request.getRequestDispatcher("./registerError.jsp");
 			rd.forward(request, response);
 		}
-
+		
 		// コンソール確認用
-		System.out.println(errorList.size());
+		System.out.println("エラー数：" + errorList.size());
 		for (String str: errorList) {
 			System.out.println(str);
 		}
