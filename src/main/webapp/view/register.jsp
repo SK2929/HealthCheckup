@@ -3,10 +3,10 @@
 <!-- <!DOCTYPE html> -->
 <html>
 <head>
-<title>確認画面</title>
+<title>登録結果画面</title>
 </head>
 <body>
-	<h2>入力情報を確認してください</h2>
+	<h2>BDに登録されました。登録情報を確認してください</h2>
 	<button type="button" onclick="location.href='./top.html'">TOPに戻る</button><br/>
 	日付：<jsp:getProperty name="rb" property="date" /><br/>
 	身長：<jsp:getProperty name="rb" property="height" /><br/>
