@@ -41,9 +41,12 @@ public class RegisterServlet extends HttpServlet {
 	}
 
 	/**
-	 * @see 取得した入力データをDB登録処理へ渡す。
+	 * @see 登録画面から取得した入力値をチェックする。
+	 * 		チェック後、入力データをDB登録処理へ渡す。
 	 *      入力データチェック処理やDB登録失敗時は、エラー画面に遷移する。
 	 *      エラーがない場合、登録結果を画面に出力する。
+	 *      memo:servletの役割を単調化するため、ロジック（61行目～を切り出して、controlle側で実装する）
+	 *      メモ：エラーリストを初期化する処理を追加する。
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -62,26 +65,26 @@ public class RegisterServlet extends HttpServlet {
 		errorList = DataCheck.RegisterData(date, height, weight, temperature);
 		
 		// Beanの作成
-		RegisterBean rb = new RegisterBean();
+		RegisterBean registerBean = new RegisterBean();
 		
 		if (errorList.size() == 0) {
 			// 入力情報の変換
-			float fheight = Float.parseFloat(height);
-			float fweight = Float.parseFloat(weight);
-			float ftemperature = Float.parseFloat(temperature);
+			float fHeight = Float.parseFloat(height);
+			float fWeight = Float.parseFloat(weight);
+			float fTemperature = Float.parseFloat(temperature);
 			
 			// Beanに格納
-			rb.setDate(date);
-			rb.setHeight(fheight);
-			rb.setWeight(fweight);
-			rb.setTemperature(ftemperature);
+			registerBean.setDate(date);
+			registerBean.setHeight(fHeight);
+			registerBean.setWeight(fWeight);
+			registerBean.setTemperature(fTemperature);
 			// response.setContentType("text/html;charset=utf-8"); // ここの設定値がない場合の挙動確認
 			
 			// Beanをリクエストに格納
-			request.setAttribute("rb", rb);
+			request.setAttribute("rb", registerBean);
 			
 			// DBデータ登録処理
-			int insertResultnum = DbConnection.register(date, fheight, fweight, ftemperature);
+			int insertResultnum = DbConnection.register(date, fHeight, fWeight, fTemperature);
 			
 			if (insertResultnum == 1) {
 				// register.jspへフォワード // URLでjspのファイルパスを指定
@@ -94,10 +97,10 @@ public class RegisterServlet extends HttpServlet {
 		
 		if (errorList.size() != 0) {
 			// Beanに格納
-			rb.setErrorList(errorList);
+			registerBean.setErrorList(errorList);
 			
 			// Beanをリクエストに格納
-			request.setAttribute("rb", rb);
+			request.setAttribute("rb", registerBean);
 			
 			// registerError.jspへフォワード
 			RequestDispatcher rd = request.getRequestDispatcher("./registerError.jsp");

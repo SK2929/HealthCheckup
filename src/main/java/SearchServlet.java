@@ -2,6 +2,7 @@
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
@@ -43,6 +44,7 @@ public class SearchServlet extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 *      メモ：エラーリストを初期化する処理を追加する。
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// リクエストの文字コード指定
@@ -57,17 +59,17 @@ public class SearchServlet extends HttpServlet {
 		errorList = DataCheck.SearchData(date);
 
 		// Beanの作成
-		RegisterBean rb = new RegisterBean();
+		RegisterBean registerBean = new RegisterBean();
 		
 		if (errorList.size() == 0) {
 			// Beanに格納
-			rb.setDate(date);
+			registerBean.setDate(date);
 			
 			// Beanをリクエストに格納
-			request.setAttribute("rb", rb);
+			request.setAttribute("rb", registerBean);
 			
-			// DBデータ登録処理
-			DbConnection.searchData(date);
+			// データ検索処理
+			ResultSet rs = DbConnection.searchData(date);
 			
 			// register.jspへフォワード // URLでjspのファイルパスを指定
 			RequestDispatcher rd = request.getRequestDispatcher("./register.jsp");
@@ -76,10 +78,10 @@ public class SearchServlet extends HttpServlet {
 		
 		if (errorList.size() != 0) {
 			// Beanに格納
-			rb.setErrorList(errorList);
+			registerBean.setErrorList(errorList);
 			
 			// Beanをリクエストに格納
-			request.setAttribute("rb", rb);
+			request.setAttribute("rb", registerBean);
 			
 			// registerError.jspへフォワード
 			RequestDispatcher rd = request.getRequestDispatcher("./registerError.jsp");
