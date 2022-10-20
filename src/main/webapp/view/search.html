@@ -7,5 +7,11 @@
 <body>
 	<h1>検索画面</h1>
 	<button type="button" onclick="location.href='./top.html'">TOPに戻る</button>
+	
+	<div>検索したい日付を入力してください。</div>
+	<form action="/HealthCheckup/view/SearchServlet" method="post">
+		日付：<input type="text" name="date"><br/>
+		<input type="submit" value="送信">
+	</form>
 </body>
 </html>

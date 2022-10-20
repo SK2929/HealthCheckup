@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import bean.RegisterBean;
+import check.DataCheck;
 import db.DbConnection;
 
 /**
@@ -19,13 +20,8 @@ import db.DbConnection;
 public class RegisterServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	// エラー格納用
-	ArrayList<String> errorList;
-	// 条件分岐用
-	int insertResultnum;
-	
 	/**
-	 * @see HttpServlet#HttpServlet()
+	 * @see 登録画面からの入力データ処理
 	 */
 	public RegisterServlet() {
 		super();
@@ -37,17 +33,20 @@ public class RegisterServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		PrintWriter out = response.getWriter();
 		out.println("<html>");
-		out.println("<body>doGet_OK</body>");
+		out.println("<body>RegisterServlet_doGet_OK</body>");
 		out.println(out);
 		out.println("</html>");
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see 登録画面から取得した入力値をチェックする。
+	 * 		チェック後、入力データをDB登録処理へ渡す。
+	 *      入力データチェック処理やDB登録失敗時は、エラー画面に遷移する。
+	 *      エラーがない場合、登録結果を画面に出力する。
+	 *      memo:servletの役割を単調化するため、ロジック（61行目～を切り出して、controlle側で実装する）
+	 *      メモ：エラーリストを初期化する処理を追加する。
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -59,32 +58,33 @@ public class RegisterServlet extends HttpServlet {
 		String height = request.getParameter("height");
 		String weight = request.getParameter("weight");
 		String temperature = request.getParameter("temperature");
-		errorList = new ArrayList<>();
+		// エラー格納用
+		ArrayList<String> errorList = new ArrayList<>();
 		
-		// 入力値のチェック
-		checkRegisterDate(date, height, weight, temperature);
+		// 入力値チェック
+		errorList = DataCheck.RegisterData(date, height, weight, temperature);
 		
 		// Beanの作成
-		RegisterBean rb = new RegisterBean();
+		RegisterBean registerBean = new RegisterBean();
 		
 		if (errorList.size() == 0) {
 			// 入力情報の変換
-			float fheight = Float.parseFloat(height);
-			float fweight = Float.parseFloat(weight);
-			float ftemperature = Float.parseFloat(temperature);
+			float fHeight = Float.parseFloat(height);
+			float fWeight = Float.parseFloat(weight);
+			float fTemperature = Float.parseFloat(temperature);
 			
 			// Beanに格納
-			rb.setDate(date);
-			rb.setHeight(fheight);
-			rb.setWeight(fweight);
-			rb.setTemperature(ftemperature);
+			registerBean.setDate(date);
+			registerBean.setHeight(fHeight);
+			registerBean.setWeight(fWeight);
+			registerBean.setTemperature(fTemperature);
 			// response.setContentType("text/html;charset=utf-8"); // ここの設定値がない場合の挙動確認
 			
 			// Beanをリクエストに格納
-			request.setAttribute("rb", rb);
+			request.setAttribute("rb", registerBean);
 			
 			// DBデータ登録処理
-			insertResultnum = DbConnection.register(date, fheight, fweight, ftemperature);
+			int insertResultnum = DbConnection.register(date, fHeight, fWeight, fTemperature);
 			
 			if (insertResultnum == 1) {
 				// register.jspへフォワード // URLでjspのファイルパスを指定
@@ -97,10 +97,10 @@ public class RegisterServlet extends HttpServlet {
 		
 		if (errorList.size() != 0) {
 			// Beanに格納
-			rb.setErrorList(errorList);
+			registerBean.setErrorList(errorList);
 			
 			// Beanをリクエストに格納
-			request.setAttribute("rb", rb);
+			request.setAttribute("rb", registerBean);
 			
 			// registerError.jspへフォワード
 			RequestDispatcher rd = request.getRequestDispatcher("./registerError.jsp");
@@ -112,73 +112,5 @@ public class RegisterServlet extends HttpServlet {
 		for (String str: errorList) {
 			System.out.println(str);
 		}
-
 	}
-
-	private void checkRegisterDate(String date, String height, String weight, String temperature) {
-		// date
-		if (!checkNull(date)) {
-			errorList.add("DateがNullです");
-		}
-		if (!checkEmpty(date)) {
-			errorList.add("Dateが入力されていません");
-		}
-
-		// height
-		if (!checkNull(height)) {
-			errorList.add("HeightがNullです");
-		}
-		if (!checkEmpty(height)) {
-			errorList.add("Heightが入力されていません");
-		}
-		if (!checkNumber(height)) {
-			errorList.add("Heightが数値ではありません");
-		}
-
-		// weight
-		if (!checkNull(weight)) {
-			errorList.add("Weightが値がNullです");
-		}
-		if (!checkEmpty(weight)) {
-			errorList.add("Weightが入力されていません");
-		}
-		if (!checkNumber(weight)) {
-			errorList.add("Weightが数値ではありません");
-		}
-
-		// temperature
-		if (!checkNull(temperature)) {
-			errorList.add("Temperatureが値がNullです");
-		}
-		if (!checkEmpty(temperature)) {
-			errorList.add("Temperatureが入力されていません");
-		}
-		if (!checkNumber(temperature)) {
-			errorList.add("Temperatureが数値ではありません");
-		}
-	}
-
-	private boolean checkNull(String value) {
-		if (value == null) {
-			return false;
-		}
-		return true;
-	}
-
-	private boolean checkEmpty(String value) {
-		if (value.isEmpty()) {
-			return false;
-		}
-		return true;
-	}
-
-	private boolean checkNumber(String value) {
-		try {
-			Float.parseFloat(value);
-			return true;
-		} catch (NumberFormatException numberFormatException) {
-			return false;
-		}
-	}
-
 }
