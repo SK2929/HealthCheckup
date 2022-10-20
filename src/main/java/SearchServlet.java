@@ -3,6 +3,7 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
@@ -71,21 +72,30 @@ public class SearchServlet extends HttpServlet {
 			// データ検索処理
 			ResultSet rs = DbConnection.searchData(date);
 			
-			// register.jspへフォワード // URLでjspのファイルパスを指定
-			RequestDispatcher rd = request.getRequestDispatcher("./register.jsp");
-			rd.forward(request, response);
-		}
-		
-		if (errorList.size() != 0) {
-			// Beanに格納
-			registerBean.setErrorList(errorList);
-			
+			// 取得したデータを展開
+			try {
+				while(rs.next()){
+					// Beanに格納
+					registerBean.setDate(rs.getString("date"));
+					registerBean.setHeight(rs.getFloat("height"));
+					registerBean.setWeight(rs.getFloat("weight"));
+					registerBean.setTemperature(rs.getFloat("Temperature"));
+					
+					// どちらでも可能
+					//System.out.println(rs.getFloat("weight"));
+					//System.out.println(rs.getFloat(4));
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 			// Beanをリクエストに格納
 			request.setAttribute("rb", registerBean);
 			
-			// registerError.jspへフォワード
-			RequestDispatcher rd = request.getRequestDispatcher("./registerError.jsp");
+			// search.jspへフォワード // URLでjspのファイルパスを指定
+			RequestDispatcher rd = request.getRequestDispatcher("./search.jsp");
 			rd.forward(request, response);
 		}
 	}
 }
+
+
