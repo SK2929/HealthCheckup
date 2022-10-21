@@ -8,10 +8,13 @@ import java.util.ArrayList;
  */
 public class DataCheck {
 	// エラー格納用
-	private static ArrayList<String> errorList = new ArrayList<>();
+	private static ArrayList<String> errorList;
 	
 	/* 登録画面から入力された値をチェック */
 	public static ArrayList<String> RegisterData(String date, String height, String weight, String temperature) {
+		// エラーリストの初期化
+		errorList = new ArrayList<>();
+		
 		// date
 		if (!checkNull(date)) {
 			errorList.add("DateがNullです");

@@ -3,15 +3,17 @@ package bean;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/*
+ * サーブレットとJSPへのデータ格納用
+ * memo:日付(date)について、string型→date型へ変える
+ * 使いまわしをするために、日付(date)を切り出し継承させる
+ */
 public class RegisterBean implements Serializable {
 	private String date;
 	private float height;
 	private float weight;
 	private float temperature;
-	private ArrayList<String> errorList;
-
-	public RegisterBean() {
-	}
+	public ArrayList<String> errorList;
 
 	public String getDate() {
 		return date;
