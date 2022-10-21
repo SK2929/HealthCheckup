@@ -7,6 +7,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import bean.RegisterBean;
+
 public class DbConnection {
     // ドライバーのクラス名
     private static final String POSTGRES_DRIVER = "org.postgresql.Driver";
@@ -25,7 +27,7 @@ public class DbConnection {
      * DBデータ登録処理
      * 戻り値1：登録成功、戻り値0：登録失敗
      */
-	public static int register(String date, float height, float weight, float temperature) {
+	public static int register(RegisterBean registerBean) {
 		
         Connection connection = null;
         int num = 0;
@@ -42,10 +44,10 @@ public class DbConnection {
             PreparedStatement ps = connection.prepareStatement(registerSql);
             
             // データセット
-            ps.setString(1, date);
-            ps.setFloat(2, height);
-            ps.setFloat(3, weight);
-            ps.setFloat(4, temperature);
+            ps.setString(1, registerBean.getDate());
+            ps.setFloat(2, registerBean.getHeight());
+            ps.setFloat(3, registerBean.getWeight());
+            ps.setFloat(4, registerBean.getTemperature());
             
             // 登録処理を実行
             num = ps.executeUpdate();
@@ -77,10 +79,9 @@ public class DbConnection {
      * DBデータ検索処理
      * 戻り値:検索結果
      */
-	public static ResultSet searchData(String date) {
+	public static void searchData(String date, RegisterBean registerBean) {
 		
         Connection connection = null;
-        ResultSet rs = null;
         
         try {
             // データベースに接続する準備。
@@ -97,8 +98,21 @@ public class DbConnection {
             ps.setString(1, date);
             
             // 検索処理を実行
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
             
+			// 取得したデータを展開
+			while(rs.next()){
+				// Beanに格納
+				registerBean.setDate(rs.getString("date"));
+				registerBean.setHeight(rs.getFloat("height"));
+				registerBean.setWeight(rs.getFloat("weight"));
+				registerBean.setTemperature(rs.getFloat("Temperature"));
+				
+				// どちらでも可能
+				//System.out.println(rs.getFloat("date"));
+				//System.out.println(rs.getFloat(4));
+			}
+
             // forName()で例外発生
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -117,6 +131,6 @@ public class DbConnection {
                 e.printStackTrace();
             }
         }
-		return rs;
+		return ;
 	}
 }
