@@ -61,6 +61,9 @@ public class DataCheck {
 	
 	/* 検索画面から入力された値をチェック */
 	public static ArrayList<String> SearchData(String date) {
+		// エラーリストの初期化
+		errorList = new ArrayList<>();
+		
 		// date
 		if (!checkNull(date)) {
 			errorList.add("DateがNullです");
@@ -68,6 +71,7 @@ public class DataCheck {
 		if (!checkEmpty(date)) {
 			errorList.add("Dateが入力されていません");
 		}
+		
 		return errorList;
 	}
 	

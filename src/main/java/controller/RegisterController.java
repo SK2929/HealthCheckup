@@ -9,7 +9,8 @@ import db.DbConnection;
 public class RegisterController {
 
 	/*
-	 * registerBeanに値を格納
+	 * 登録画面からの入力値をregisterBeanに格納
+	 * エラーが存在する場合、registerBeanのerrorListに格納
 	 */
 	static public RegisterBean setRegisterBeanData(RegisterBean registerBean, String date, String height, String weight,
 			String temperature) {
@@ -38,9 +39,9 @@ public class RegisterController {
 		registerBean.setTemperature(fTemperature);
 		
 		// DBデータ登録処理
-		int insertResultNum = DbConnection.register(registerBean);
+		int insertResultNum = DbConnection.registerData(registerBean);
 		
-		if (insertResultNum == 1) {
+		if (insertResultNum == 0) {
 			errorList.add("データ登録に失敗しました");
 			
 			// Beanに格納

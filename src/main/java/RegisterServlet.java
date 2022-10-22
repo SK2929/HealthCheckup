@@ -39,8 +39,7 @@ public class RegisterServlet extends HttpServlet {
 	}
 
 	/**
-	 * @see 登録画面から取得した入力値をチェックする。
-	 * 		チェック後、入力データをDB登録処理へ渡す。
+	 * @see 登録画面から取得した入力値をregisterControllerへ渡す。
 	 *      入力データチェック処理やDB登録失敗時は、エラー画面に遷移する。
 	 *      エラーがない場合、登録結果を画面に出力する。
 	 */
@@ -65,13 +64,15 @@ public class RegisterServlet extends HttpServlet {
 		request.setAttribute("rb", registerBean);
 		
 		// registerBeanのerrorListの有無で処理を分岐
+		if (registerBean.errorList == null) {
+			// register.jspへフォワード // URLでjspのファイルパスを指定
+			RequestDispatcher rd = request.getRequestDispatcher("./register.jsp");
+			rd.forward(request, response);
+		}
+		
 		if (registerBean.errorList.size() != 0) {
 			// registerError.jspへフォワード
 			RequestDispatcher rd = request.getRequestDispatcher("./registerError.jsp");
-			rd.forward(request, response);
-		} else {
-			// register.jspへフォワード // URLでjspのファイルパスを指定
-			RequestDispatcher rd = request.getRequestDispatcher("./register.jsp");
 			rd.forward(request, response);
 		}
 	}
