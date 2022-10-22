@@ -27,7 +27,7 @@ public class DbConnection {
      * DBデータ登録処理
      * 戻り値1：登録成功、戻り値0：登録失敗
      */
-	public static int register(RegisterBean registerBean) {
+	public static int registerData(RegisterBean registerBean) {
 		
         Connection connection = null;
         int num = 0;
@@ -52,8 +52,6 @@ public class DbConnection {
             // 登録処理を実行
             num = ps.executeUpdate();
             
-            System.out.println(num + "件データを登録しました。");
-            
             // forName()で例外発生
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -77,11 +75,13 @@ public class DbConnection {
 	
     /*
      * DBデータ検索処理
-     * 戻り値:検索結果
+     * 入力値を基にDB検索が成功した場合、searchResultNumを1に変更し、registerBeanに検索結果を格納
+     * 戻り値1：検索成功、戻り値0：検索失敗
      */
-	public static void searchData(String date, RegisterBean registerBean) {
+	public static int searchData(RegisterBean registerBean) {
 		
         Connection connection = null;
+        int searchResultNum = 0;
         
         try {
             // データベースに接続する準備。
@@ -95,7 +95,7 @@ public class DbConnection {
             PreparedStatement ps = connection.prepareStatement(searchSql);
             
             // データセット
-            ps.setString(1, date);
+            ps.setString(1, registerBean.getDate());
             
             // 検索処理を実行
             ResultSet rs = ps.executeQuery();
@@ -108,12 +108,13 @@ public class DbConnection {
 				registerBean.setWeight(rs.getFloat("weight"));
 				registerBean.setTemperature(rs.getFloat("Temperature"));
 				
-				// どちらでも可能
+				searchResultNum = 1;
+				// 展開方法はどちらでも可能
 				//System.out.println(rs.getFloat("date"));
 				//System.out.println(rs.getFloat(4));
 			}
-
-            // forName()で例外発生
+			
+            // forName()やBD内に検索対象データが存在しない時、例外発生
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
 
@@ -131,6 +132,6 @@ public class DbConnection {
                 e.printStackTrace();
             }
         }
-		return ;
+		return searchResultNum;
 	}
 }
