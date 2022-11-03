@@ -42,7 +42,7 @@ public class RegisterController {
 		int insertResultNum = DbConnection.registerData(registerBean);
 		
 		if (insertResultNum == 0) {
-			errorList.add("データ登録に失敗しました");
+			errorList.add("同じ日付が登録されています。データ登録に失敗しました");
 			
 			// Beanに格納
 			registerBean.setErrorList(errorList);

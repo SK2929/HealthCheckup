@@ -20,8 +20,9 @@ public class DbConnection {
     private static final String PASS = "●●●";
     
     // SQL作成
-    private static String registerSql = "INSERT INTO health(date, height, weight, temperature) VALUES( ?, ?, ?, ?) ";
+    private static String registerSql = "INSERT INTO health(date, height, weight, temperature) VALUES(?, ?, ?, ?) ";
     private static String searchSql = "SELECT * FROM health WHERE date = ?";
+    private static String changeSql = "UPDATE health SET (date, height, weight, temperature) = (?, ?, ?, ?) WHERE date = ?";
     
     /*
      * DBデータ登録処理
@@ -114,6 +115,57 @@ public class DbConnection {
 				//System.out.println(rs.getFloat(4));
 			}
 			
+        // forName()やBD内に検索対象データが存在しない時、例外発生
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+
+            // getConnection()で例外発生
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                if (connection != null) {
+                    // データベースを切断
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+		return searchResultNum;
+	}
+	
+    /*
+     * DBデータ検索処理
+     * 入力値を基にDB検索が成功した場合、searchResultNumを1に変更する
+     * 戻り値1：検索成功、戻り値0：検索失敗
+     */
+	public static int searchData(String beforeDate) {
+		
+        Connection connection = null;
+        int searchResultNum = 0;
+        
+        try {
+            // データベースに接続する準備。
+            // Class.forName()メソッドにJDBCドライバ名を与えJDBCドライバをロード
+            Class.forName(POSTGRES_DRIVER);
+
+            // 接続先の情報。引数:「JDMC接続先情報」,「ユーザー名」,「パスワード」
+            connection = DriverManager.getConnection(JDBC_CONNECTION, USER, PASS);
+            
+            // 上記のSQL文を受け取って接続
+            PreparedStatement ps = connection.prepareStatement(searchSql);
+            
+            // データセット
+            ps.setString(1, beforeDate);
+            
+            // 検索処理を実行
+            ResultSet rs = ps.executeQuery();
+            
+            // 検索処理成功時
+            searchResultNum = 1;
+            
             // forName()やBD内に検索対象データが存在しない時、例外発生
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -133,5 +185,58 @@ public class DbConnection {
             }
         }
 		return searchResultNum;
+	}
+	
+
+    /*
+     * DBデータ更新処理
+     * 入力値を基にDB更新が成功した場合、changeResultNumを1に変更する
+     * 戻り値1：更新成功、戻り値0：更新失敗
+     */
+	public static int changeData(RegisterBean registerBean, String beforeDate) {
+		
+        Connection connection = null;
+        int changeResultNum = 0;
+        
+        try {
+            // データベースに接続する準備。
+            // Class.forName()メソッドにJDBCドライバ名を与えJDBCドライバをロード
+            Class.forName(POSTGRES_DRIVER);
+
+            // 接続先の情報。引数:「JDMC接続先情報」,「ユーザー名」,「パスワード」
+            connection = DriverManager.getConnection(JDBC_CONNECTION, USER, PASS);
+            
+            // 上記のSQL文を受け取って接続
+            PreparedStatement ps = connection.prepareStatement(changeSql);
+            
+            // データセット
+            ps.setString(1, registerBean.getDate());
+            ps.setFloat(2, registerBean.getHeight());
+            ps.setFloat(3, registerBean.getWeight());
+            ps.setFloat(4, registerBean.getTemperature());
+            ps.setString(5, beforeDate);
+            
+            // 検索処理を実行
+            changeResultNum = ps.executeUpdate();
+            
+            // forName()やBD内に検索対象データが存在しない時、例外発生
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+
+            // getConnection()で例外発生
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        } finally {
+            try {
+                if (connection != null) {
+                    // データベースを切断
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+		return changeResultNum;
 	}
 }
