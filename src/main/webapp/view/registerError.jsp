@@ -6,8 +6,8 @@
 <title>エラー画面</title>
 </head>
 <body>
-	<h1>入力値エラーです</h1>
-	<button type="button" onclick="location.href='./register.html'">登録画面に戻る</button>
+	<h1>エラー画面</h1>
+	<button type="button" onclick="location.href='./top.html'">TOPに戻る</button>
 	<br/>
 	<%-- errorList分出力 --%>
 	<%= rb.getErrorList() %>
